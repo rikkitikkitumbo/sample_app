@@ -1,0 +1,15 @@
+module Kites
+	
+	def wind
+		puts "The wind blows... and all kites fly"
+	end
+	
+	def newb	
+		Kite.new("green")
+	end
+	
+	def fly
+		puts "I am a #{@color} kite, and I'm flying"
+	end
+	
+end
