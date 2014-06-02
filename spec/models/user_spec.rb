@@ -15,8 +15,19 @@ describe User do
 	it { should respond_to(:password_confirmation) }
 	it { should respond_to(:remember_token) }
 	it { should respond_to(:authenticate) }
+	it { should respond_to(:admin) }
 	
 	it { should be_valid }
+	it { should_not be_admin }
+	
+	describe "with admin attribute set to 'true'" do
+		before do
+			@user.save!
+			@user.toggle!(:admin)
+		end
+		
+		it { should be_admin }
+	end
 	
 	describe "when name is not present" do
 		before { @user.name = " " }
@@ -79,18 +90,24 @@ describe User do
 			@user = User.new(name: "Example User", email: "user@example.com",
 							password: " ", password_confirmation: " ")
 		end
+		
 		it { should_not be_valid }
 	end
 		
+	
 	describe "with a password that's too short" do
 		before { @user.password = @user.password_confirmation = "a" * 5 }
+		
 		it { should be_invalid }
 	end
 	
+	
 	describe "when password doesn't match the confirmation" do
 		before { @user.password_confirmation = "mismatch" }
+		
 		it { should_not be_valid }
 	end
+	
 	
 	describe "return the value of authenticate method"  do
 		before { @user.save }
@@ -107,6 +124,7 @@ describe User do
 			specify { expect(user_for_invalid_password).to be_false }
 		end
 	end
+	
 	
 	describe "remember token" do
 		before { @user.save }
@@ -125,6 +143,26 @@ describe User do
 		end
 	end
 	
+	
+	describe "User pages" do
+	
+		describe "edit" do
+			let(:user) { FactoryGirl.create(:user) }
+			before { visit edit_user_path(user) }
+			
+			describe "page" do
+				it { should have_content("Update your profile") }
+				it { should have_title("Edit user") }
+				it { should have_link('change', href: 'http://gravatar.com/emails') }
+			end
+			
+			describe "with invalid information" do
+				before { click_button "Save changes" }
+				
+				it { should have_content('error') }
+			end
+		end
+	end
 end
 		
 
